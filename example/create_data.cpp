@@ -34,10 +34,12 @@ void create_in(){
 
         f.close();
 
-        cout << "The file water.in has been created \n";
+        cout<<"\033[1;32m\n\tThe file water.in has been created.\n\033[0m\n";
+
     }
     else{
-        cout << "The file water.in cannot be created \n";
+        cout << " \n";
+        cout<<"\033[1;31m\n\tThe file water.in cannot be created.\n\033[0m\n";
         exit(-1);
     }
 
@@ -54,7 +56,7 @@ void create_par(){
         f << "vtk_out_freq     " << 1 <<endl;
         f << "time_end         " << 1.0 <<endl;
         f << "del_t            " << 0.05 <<endl;
-        f << "g                " << 0 << -9.81 << 0 <<endl;
+        f << "g                " << 0 << " " << -9.81 << " " << 0 <<endl;
         f << "ro_0             " << 998.29 <<endl;
         f << "mu               " << 3.5 <<endl;
         f << "sigma            " << 0.0728 <<endl;
@@ -70,10 +72,12 @@ void create_par(){
 
         f.close();
 
-        cout << "The file water.par has been created \n";
+        cout<<"\033[1;32m\n\tThe file water.par has been created.\n\033[0m\n";
+
     }
     else{
-        cout << "The file water.par cannot be created \n";
+        cout << " \n";
+        cout<<"\033[1;31m\n\tThe file water.par cannot be created.\n\033[0m\n";
         exit(-1);
     }
 

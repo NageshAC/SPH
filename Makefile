@@ -10,7 +10,7 @@ INCLUDE_PATH = ./src/includes/
 
 MAIN = $($(SOURCES_PATH) + "simulate.cu")
 EXAMPLE = ./example/create_data.cpp
-HEADERS = ./src/includes/check_status.hpp
+HEADERS = ./src/includes/parameters.cpp
 
 
 all: example simulate clean
