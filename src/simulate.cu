@@ -17,6 +17,7 @@
  #include "./includes/particle.cpp"
  #include "./includes/input.cpp"
  #include "./includes/wireframe.cpp"
+ #include "./includes/vtk.cpp"
 
  using namespace std;
  using namespace thrust;
@@ -85,6 +86,8 @@
         y_min, y_max, 
         z_min, z_max
     );
+
+    write_VTK(vtk_out_file, 0, raw_pointer_cast(&p[0]), N);
 
     return 0;
  }
