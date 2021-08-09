@@ -16,6 +16,7 @@
  #include "./includes/parameters.cpp"
  #include "./includes/particle.cpp"
  #include "./includes/input.cpp"
+ #include "./includes/wireframe.cpp"
 
  using namespace std;
  using namespace thrust;
@@ -75,6 +76,15 @@
         //     N
         // );
     }
+
+    //**************************************************
+    // boundary 
+    //**************************************************
+    create_wireframe(
+        x_min, x_max, 
+        y_min, y_max, 
+        z_min, z_max
+    );
 
     return 0;
  }
