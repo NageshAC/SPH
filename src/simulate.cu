@@ -14,6 +14,8 @@
  #include<thrust/device_vector.h>
 
  #include "./includes/parameters.cpp"
+ #include "./includes/particle.cpp"
+ #include "./includes/input.cpp"
 
  using namespace std;
  using namespace thrust;
@@ -56,6 +58,21 @@
         //     x_min, x_max,
         //     y_min, y_max,
         //     z_min, z_max
+        // );
+    }
+
+    host_vector<particle> p;
+    int N, frames = (time_end/del_t);
+
+    //**************************************************
+    // reading .in files
+    //**************************************************
+    {
+        full_file = input_path + part_in_file;
+        p = readInput(full_file,N);
+        // printInput(
+        //     raw_pointer_cast(&p[0]),
+        //     N
         // );
     }
 
