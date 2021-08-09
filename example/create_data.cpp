@@ -49,24 +49,24 @@ void create_par(){
     f.open("./data/water.par", ios::out);
     if(f.is_open()){
 
-        f << "part_input_file" << "\t" << "water.in" <<endl;
-        f << "vtk_out_file   " << "water_" <<endl;
-        f << "vtk_out_freq   " << 1 <<endl;
-        f << "time_end       " << 1.0 <<endl;
-        f << "del_t          " << 0.05 <<endl;
-        f << "g              " << 0 << -9.81 << 0 <<endl;
-        f << "ro_0           " << 998.29 <<endl;
-        f << "mu             " << 3.5 <<endl;
-        f << "sigma          " << 0.0728 <<endl;
-        f << "l              " << 1E-2 <<endl;
-        f << "k              " << 3 <<endl;
-        f << "h              " << 1 <<endl;
-        f << "x_min          " << 0 <<endl;
-        f << "x_max          " << 10 <<endl;
-        f << "y_min          " << 0 <<endl;
-        f << "y_max          " << 10 <<endl;
-        f << "z_min          " << 0 <<endl;
-        f << "z_max          " << 10;
+        f << "part_input_file  " << "water.in" <<endl;
+        f << "vtk_out_file     " << "water_" <<endl;
+        f << "vtk_out_freq     " << 1 <<endl;
+        f << "time_end         " << 1.0 <<endl;
+        f << "del_t            " << 0.05 <<endl;
+        f << "g                " << 0 << -9.81 << 0 <<endl;
+        f << "ro_0             " << 998.29 <<endl;
+        f << "mu               " << 3.5 <<endl;
+        f << "sigma            " << 0.0728 <<endl;
+        f << "l                " << 1E-2 <<endl;
+        f << "k                " << 3 <<endl;
+        f << "h                " << 1 <<endl;
+        f << "x_min            " << 0 <<endl;
+        f << "x_max            " << 10 <<endl;
+        f << "y_min            " << 0 <<endl;
+        f << "y_max            " << 10 <<endl;
+        f << "z_min            " << 0 <<endl;
+        f << "z_max            " << 10;
 
         f.close();
 
