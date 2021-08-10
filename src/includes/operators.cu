@@ -26,9 +26,9 @@ void copy(double* x, const double* y, int n = 3){
 // l2 norm
 //**************************************************************
 __device__
-double norm(const double* x){
+double norm(const double* x, int dim = 3){
     double result = 0;
-    for(int i=0; i<3; i++){
+    for(int i=0; i<dim; i++){
         result += pow(x[i],2);
     }
     return sqrt(result);
@@ -38,27 +38,46 @@ double norm(const double* x){
 // vector const multiplication
 //**************************************************************
 __device__
-void multiply(const double* c, double* x){
-    for(auto i=0; i<3;i++) x[i] *= *c;
+void axpy(const double a, const double* x, double* y, int dim =3){
+    for(int i=0; i<3; i++) y[i] += a * x[i];
+
+}
+
+//**************************************************************
+// vector const multiplication
+//**************************************************************
+__device__
+void multiply(const double* c, double* x, int dim = 3){
+    for(auto i=0; i<dim; i++) x[i] *= *c;
 }
 
 __device__
-double* multiply(const double c, const double* x){
-    double* r = new double [3];
-
-    for(auto i=0; i<3;i++) r[i] = x[i] * (c);
-
-    return r;
+void multiply(double* r, const double c, const double* x, int dim = 3){
+    for(auto i=0; i<dim; i++) r[i] = x[i] * (c);
 }
 
 //**************************************************************
 // vector vector subtraction
 //**************************************************************
 __device__
-double* subtract(const double* x, const double* y){
-    double* r = new double [3];
-    for(int i=0; i<3; i++){
-        r[i] = x[i] - y[i];
-    }
-    return r;
+void subtract(double* x, const double* y, int dim = 3){
+    for(int i=0; i<3; i++) x[i] = x[i] - y[i];
+}
+
+__device__
+void subtract(double* r, const double* x, const double* y, int dim = 3){
+    for(int i=0; i<3; i++) r[i] = x[i] - y[i];
+}
+
+//**************************************************************
+// vector vector addition
+//**************************************************************
+__device__
+void add(double* x, const double* y, int dim = 3){
+    for(int i=0; i<3; i++) x[i] = x[i] + y[i];
+}
+
+__device__
+void add(double* r, const double* x, const double* y, int dim = 3){
+    for(int i=0; i<3; i++) r[i] = x[i] + y[i];
 }

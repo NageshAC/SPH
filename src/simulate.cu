@@ -108,20 +108,53 @@
         );
         // cout<<"Max threads per block: "<<deviceProp.maxThreadsPerBlock<<endl;
 
-        int blockSize = deviceProp.maxThreadsPerBlock, 
-        gridSize = (N/deviceProp.maxThreadsPerBlock)+1;
+        int blockSize, gridSize;
+        if(N<deviceProp.maxThreadsPerBlock){
+            blockSize = N;
+            gridSize = 1;
+        }
+        else{
+            blockSize = deviceProp.maxThreadsPerBlock;
+            gridSize = (N/deviceProp.maxThreadsPerBlock)+1;
+        }
 
         // cout<<"Block Size: "<<blockSize<<"\nGrid size: "<<gridSize<<endl
         // <<"Frames: "<<frames<<endl;
 
-        // calculate density
-        cal_density<<<gridSize,blockSize>>>(
-            raw_pointer_cast(&d_p[0]),
-            ro_0, N, h
-        );
-        cudaDeviceSynchronize();
-        p = d_p;
-        write_VTK(vtk_out_file, 1, raw_pointer_cast(&p[0]), N);
+        for(int frame = 1; frame<=frames; frame++){
+            // calculate density
+            cal_density<<<gridSize,blockSize>>>(
+                raw_pointer_cast(&d_p[0]),
+                ro_0, N, h
+            );
+            cudaDeviceSynchronize();
+
+            if(frame == 1){
+                p = d_p;
+                write_VTK(vtk_out_file, 0, raw_pointer_cast(&p[0]), N);
+            }
+            
+            // calculate force
+            cal_force<<<gridSize,blockSize>>>(
+                raw_pointer_cast(&d_p[0]),
+                raw_pointer_cast(&d_g[0]),
+                ro_0, N, h
+            );
+            cudaDeviceSynchronize();
+
+            // leap-frog scheme of integration
+            cal_leapfrog<<<gridSize,blockSize>>>(
+                raw_pointer_cast(&d_p[0]),
+                x_min, x_max, y_min, 
+                y_max, z_min, z_max,
+                del_t, N
+            );
+            cudaDeviceSynchronize();
+            // cuda_status(cudaMemcpy(raw_pointer_cast(&p[0]), raw_pointer_cast(&d_p[0]), sizeof(particle), cudaMemcpyDeviceToHost));
+            p = d_p;
+            write_VTK(vtk_out_file, frame, raw_pointer_cast(&p[0]), N);
+
+        }
 
     }
 

@@ -18,7 +18,7 @@ void create_in(){
     f.open("./data/water.in", ios::out);
     if(f.is_open()){
 
-        double mass = 0.001;
+        double mass = 1000;
         double Vx = 0, Vy = 0, Vz = 0;
 
         f << (double)(5*5*5);
@@ -54,8 +54,8 @@ void create_par(){
         f << "part_input_file  " << "water.in" <<endl;
         f << "vtk_out_file     " << "water_" <<endl;
         f << "vtk_out_freq     " << 1 <<endl;
-        f << "time_end         " << 1.0 <<endl;
-        f << "del_t            " << 0.05 <<endl;
+        f << "time_end         " << 5.0 <<endl;
+        f << "del_t            " << 0.01 <<endl;
         f << "g                " << 0 << " " << -9.81 << " " << 0 <<endl;
         f << "ro_0             " << 998.29 <<endl;
         f << "mu               " << 3.5 <<endl;
