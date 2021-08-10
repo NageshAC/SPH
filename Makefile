@@ -10,7 +10,7 @@ INCLUDE_PATH = ./src/includes/
 
 MAIN = $($(SOURCES_PATH) + "simulate.cu")
 EXAMPLE = ./example/create_data.cpp
-HEADERS = ./src/includes/parameters.cpp
+HEADERS = $($(SOURCES_PATH) + "check_status.cu") $($(SOURCES_PATH) + "parameters.cpp")  $($(SOURCES_PATH) + "particle.cpp")  $($(SOURCES_PATH) + "input.cpp")  $($(SOURCES_PATH) + "wireframe.cpp")  $($(SOURCES_PATH) + "vtk.cpp")
 
 
 all: example simulate clean
