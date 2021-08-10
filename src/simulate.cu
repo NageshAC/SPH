@@ -19,6 +19,7 @@
  #include "./includes/input.cpp"
  #include "./includes/wireframe.cpp"
  #include "./includes/vtk.cpp"
+ #include "./includes/field.cu"
 
  using namespace std;
  using namespace thrust;
@@ -96,6 +97,7 @@
     {
         // creating copy of particle vector in GPU
         device_vector<particle> d_p(p);
+        device_vector<double> d_g(g);
 
         // creating block and grids
         cudaDeviceProp deviceProp;
@@ -112,6 +114,14 @@
         // cout<<"Block Size: "<<blockSize<<"\nGrid size: "<<gridSize<<endl
         // <<"Frames: "<<frames<<endl;
 
+        // calculate density
+        cal_density<<<gridSize,blockSize>>>(
+            raw_pointer_cast(&d_p[0]),
+            ro_0, N, h
+        );
+        cudaDeviceSynchronize();
+        p = d_p;
+        write_VTK(vtk_out_file, 1, raw_pointer_cast(&p[0]), N);
 
     }
 
