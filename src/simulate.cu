@@ -13,6 +13,7 @@
  #include<thrust/host_vector.h>
  #include<thrust/device_vector.h>
 
+ #include "./includes/check_status.cu"
  #include "./includes/parameters.cpp"
  #include "./includes/particle.cpp"
  #include "./includes/input.cpp"
@@ -87,7 +88,33 @@
         z_min, z_max
     );
 
-    write_VTK(vtk_out_file, 0, raw_pointer_cast(&p[0]), N);
+    // write_VTK(vtk_out_file, 0, raw_pointer_cast(&p[0]), N);
+
+    //**************************************************
+    // CUDA Programming
+    //**************************************************
+    {
+        // creating copy of particle vector in GPU
+        device_vector<particle> d_p(p);
+
+        // creating block and grids
+        cudaDeviceProp deviceProp;
+        cuda_status(
+            cudaGetDeviceProperties(&deviceProp,0),
+            "Get device Properties",
+            __FILE__, __LINE__
+        );
+        // cout<<"Max threads per block: "<<deviceProp.maxThreadsPerBlock<<endl;
+
+        int blockSize = deviceProp.maxThreadsPerBlock, 
+        gridSize = (N/deviceProp.maxThreadsPerBlock)+1;
+
+        // cout<<"Block Size: "<<blockSize<<"\nGrid size: "<<gridSize<<endl
+        // <<"Frames: "<<frames<<endl;
+
+
+    }
+
 
     return 0;
  }
