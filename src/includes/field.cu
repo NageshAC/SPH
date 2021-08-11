@@ -12,6 +12,7 @@
 #include"./particle.cpp"
 #include"./smoothening_kernels.cu"
 #include"./operators.cu"
+#include"./check_boundary.cu"
 
 //************************************************************
 // density calculation
@@ -22,11 +23,9 @@ void cal_density(particle* p, double ro_0, int N, double h){
     if(idx<N){
         double mass = 0;
         for(int j=0; j<N; j++){
-            if(j!=idx){
-                double r[3]; 
-                subtract(r,p[idx].g_position(),p[j].g_position());
-                mass += p[j].g_mass() * w_poly6(r, h);
-            }
+            double r[3]; 
+            subtract(r,p[idx].g_position(),p[j].g_position());
+            mass += p[j].g_mass() * w_poly6(r, h);  
         }
         p[idx].s_density(mass);
         p[idx].update_md();
@@ -60,7 +59,7 @@ void cal_leapfrog(
     const double ymin, const double ymax, 
     const double zmin, const double zmax,
     const double del_t, const int N){
-        
+
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if(idx<N){
         double den = p[idx].g_density();
@@ -72,7 +71,14 @@ void cal_leapfrog(
 
             axpy(del_t, p[idx].g_velocity(), p[idx].g_position());
 
+            // boundary condition
+            check_bound(
+                p[idx].g_position(), p[idx].g_velocity(), del_t,
+                xmin, xmax, ymin, ymax, zmin, zmax
+            );
+
             axpy(c, p[idx].g_force(), p[idx].g_velocity());
+
         }
     }
 }
