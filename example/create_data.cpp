@@ -18,12 +18,12 @@ void create_in(){
     f.open("./data/water.in", ios::out);
     if(f.is_open()){
 
-        double mass = 1000;
+        double mass = 0.02;
         double Vx = 0, Vy = 0, Vz = 0;
 
         f << (double)(5*5*5);
-        for(double z=7; z<=9; z+=0.5){ 
-            for(double y=4; y<=6; y+=0.5){
+        for(double z=4; z<=6; z+=0.5){ 
+            for(double y=7; y<=9; y+=0.5){
                 for(double x=4; x<=6; x+=0.5){
                     f << endl << setprecision(3) << mass;
                     f << setprecision(1) << std::fixed << " " << x << " " << y << " " << z;
@@ -57,11 +57,11 @@ void create_par(){
         f << "time_end         " << 10.0 <<endl;
         f << "del_t            " << 0.01 <<endl;
         f << "g                " << 0 << " " << -9.81 << " " << 0 <<endl;
-        f << "ro_0             " << 998.29 <<endl;
+        f << "ro_0             " << 0.02 <<endl;
         f << "mu               " << 3.5 <<endl;
         f << "sigma            " << 0.0728 <<endl;
         f << "l                " << 1E-2 <<endl;
-        f << "k                " << 3 <<endl;
+        f << "k                " << 2 <<endl;
         f << "h                " << 1 <<endl;
         f << "x_min            " << 0 <<endl;
         f << "x_max            " << 10 <<endl;

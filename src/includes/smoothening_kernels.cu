@@ -36,6 +36,7 @@ double w_poly6 (const double* r, const double h){
     double c = 315/(64*M_PI*pow(h,9));
     result *= c;
     return result;
+    
 }
 
 __device__
@@ -74,6 +75,9 @@ void grad_spiky(double* r, const double h){
         double result = pow(h-n_r, 2);
         result *= c;
         multiply(&result, r);
+    }
+    else{
+        for(int i=0; i<3; i++) r[i] = 0;
     }
 }
 

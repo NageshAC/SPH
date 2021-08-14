@@ -138,7 +138,7 @@
             cal_force<<<gridSize,blockSize>>>(
                 raw_pointer_cast(&d_p[0]),
                 raw_pointer_cast(&d_g[0]),
-                ro_0, N, h
+                ro_0, k, N, h
             );
             cudaDeviceSynchronize();
 
