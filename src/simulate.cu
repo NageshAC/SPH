@@ -8,6 +8,7 @@
 
  #include<iostream>
  #include<string>
+ #include<chrono>
 
  #include<cuda_runtime.h>
  #include<thrust/host_vector.h>
@@ -121,6 +122,8 @@
         // cout<<"Block Size: "<<blockSize<<"\nGrid size: "<<gridSize<<endl
         // <<"Frames: "<<frames<<endl;
 
+        auto start = chrono::high_resolution_clock::now();
+
         for(int frame = 1; frame<=frames; frame++){
             // calculate density
             cal_density<<<gridSize,blockSize>>>(
@@ -138,7 +141,7 @@
             cal_force<<<gridSize,blockSize>>>(
                 raw_pointer_cast(&d_p[0]),
                 raw_pointer_cast(&d_g[0]),
-                ro_0, k, N, h
+                ro_0, k, mu, sigma, l, N, h
             );
             cudaDeviceSynchronize();
 
@@ -155,6 +158,10 @@
             write_VTK(vtk_out_file, frame, raw_pointer_cast(&p[0]), N);
 
         }
+
+        auto end = chrono::high_resolution_clock::now();
+        chrono::duration<float> duration = end - start;
+        cout << duration.count() << "s \n";
 
     }
 

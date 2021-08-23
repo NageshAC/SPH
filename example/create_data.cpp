@@ -18,15 +18,15 @@ void create_in(){
     f.open("./data/water.in", ios::out);
     if(f.is_open()){
 
-        double mass = 0.02;
+        double mass = 4E-6;
         double Vx = 0, Vy = 0, Vz = 0;
 
-        f << (double)(5*5*5);
-        for(double z=4; z<=6; z+=0.5){ 
-            for(double y=7; y<=9; y+=0.5){
-                for(double x=4; x<=6; x+=0.5){
-                    f << endl << setprecision(3) << mass;
-                    f << setprecision(1) << std::fixed << " " << x << " " << y << " " << z;
+        f << (int)(20*20*20);
+        for(double z=0.4; z<=0.6; z+=0.01){ 
+            for(double y=0.7; y<=0.9; y+=0.01){
+                for(double x=0.4; x<=0.6; x+=0.01){
+                    f << endl << setprecision(6) << std::fixed << mass;
+                    f << setprecision(6) << std::fixed << " " << x << " " << y << " " << z;
                     f << setprecision(1) << std::fixed << " " << Vx << " " << Vy << " " << Vz;
                 }
             }
@@ -54,21 +54,21 @@ void create_par(){
         f << "part_input_file  " << "water.in" <<endl;
         f << "vtk_out_file     " << "water_" <<endl;
         f << "vtk_out_freq     " << 1 <<endl;
-        f << "time_end         " << 10.0 <<endl;
+        f << "time_end         " << 5.0 <<endl;
         f << "del_t            " << 0.01 <<endl;
         f << "g                " << 0 << " " << -9.81 << " " << 0 <<endl;
-        f << "ro_0             " << 0.02 <<endl;
+        f << "ro_0             " << 998.29 <<endl;
         f << "mu               " << 3.5 <<endl;
         f << "sigma            " << 0.0728 <<endl;
         f << "l                " << 1E-2 <<endl;
-        f << "k                " << 2 <<endl;
-        f << "h                " << 1 <<endl;
+        f << "k                " << 1 <<endl;
+        f << "h                " << 0.002 <<endl;
         f << "x_min            " << 0 <<endl;
-        f << "x_max            " << 10 <<endl;
+        f << "x_max            " << 1 <<endl;
         f << "y_min            " << 0 <<endl;
-        f << "y_max            " << 10 <<endl;
+        f << "y_max            " << 1 <<endl;
         f << "z_min            " << 0 <<endl;
-        f << "z_max            " << 10;
+        f << "z_max            " << 1;
 
         f.close();
 

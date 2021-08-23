@@ -24,7 +24,7 @@ using namespace thrust;
 // W_poly6, grad_poly6 and lap_poly6
 //**************************************************
 __device__
-double w_poly6 (const double* r, const double h){
+inline double w_poly6 (const double* r, const double h){
     double n_r = norm(r);
     double result;
     if(0<=n_r && n_r<=h){
@@ -40,7 +40,7 @@ double w_poly6 (const double* r, const double h){
 }
 
 __device__
-void grad_poly6(double* r, const double h){
+inline void grad_poly6(double* r, const double h){
     double n_r = norm(r);
     if(0<=n_r && n_r<=h){
         double c = -945/(32*M_PI*pow(h,9));
@@ -52,7 +52,7 @@ void grad_poly6(double* r, const double h){
 }
 
 __device__
-double lap_poly6(const double* r, const double h){
+inline double lap_poly6(const double* r, const double h){
     double n_r = norm(r);
     if(0<=n_r && n_r<=h){
         double c = -945/(32*M_PI*pow(h,9));
@@ -68,9 +68,9 @@ double lap_poly6(const double* r, const double h){
 //  grad_spiky  for pressure field
 //**************************************************
 __device__
-void grad_spiky(double* r, const double h){
+inline void grad_spiky(double* r, const double h){
     double n_r = norm(r);
-    if(0<=n_r && n_r<=h){
+    if(0<n_r && n_r<=h){
         double c = -45/(M_PI*pow(h,6)*n_r);
         double result = pow(h-n_r, 2);
         result *= c;
@@ -85,9 +85,9 @@ void grad_spiky(double* r, const double h){
 //  lap_viscosity  for viscosity field
 //**************************************************
 __device__
-double lap_viscosity(const double* r, const double h){
+inline double lap_viscosity(const double* r, const double h){
     double n_r = norm(r);
-    if(0<=n_r && n_r<=h){
+    if(0.05<=n_r && n_r<h){
         double c = 45/(M_PI*pow(h,6));
         double result = h-n_r;
         result *= c;

@@ -23,6 +23,7 @@ class particle{
             pressure,
             position[3],
             velocity[3],
+            color,
             n[3],
             force[3];
 
@@ -34,6 +35,7 @@ class particle{
             m_d = 0.0;
             pressure = 0.0;
             mass = 0.0;
+            color = 0.0;
             for(int i=0;i<3; i++){
                 position[i] = 0.0;
                 force[i] = 0.0;
@@ -53,6 +55,9 @@ class particle{
 
             __host__ __device__
             inline void s_md(double other){this->m_d = other;}
+
+            __host__ __device__
+            inline void s_color(double other){this->color = other;}
 
             __host__ __device__
             inline void s_pressure(double other){this->pressure = other;}
@@ -102,6 +107,9 @@ class particle{
 
             __host__ __device__
             inline double g_mass(){return this->mass;}
+
+            __host__ __device__
+            inline double g_color(){return this->color;}
 
             __host__ __device__
             inline double g_md(){return this->m_d;}
