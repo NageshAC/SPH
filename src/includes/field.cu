@@ -97,29 +97,21 @@ void cal_force(
 
         // surface tension
         {
-            // calculating c(i)
+            // calculating c(i) and n(i)
             double color = 0;
+            double *n = p[idx].g_n();
+            for(int i=0; i<3; i++) n[i] = 0;
             double r[3];
             for(int j=0; j<N; j++){
-                // if(idx != j){ 
-                    subtract(r,p[idx].g_position(),p[j].g_position());
-                    color += p[j].g_md() * lap_poly6(r, h);
-                // }
-            }
-            p[idx].s_color(color);
-
-            // calculating n(i)
-            double n[3];
-            for(int i=0; i<3; i++) n[i] = 0;
-            for(int j=0; j<N; j++){
-                subtract(r,p[idx].g_position(),p[j].g_position());
+                subtract(r,xi,p[j].g_position());
+                color += p[j].g_md() * lap_poly6(r, h);
                 grad_poly6(r,h);
                 axpy(p[j].g_md(), r, n);
             }
-            p[idx].s_n(n);
+            p[idx].s_color(color);
 
             // calculating surdace force
-            double n_n = norm(p[idx].g_n());
+            double n_n = norm(n);
             if(n_n >= l){
                 color *= -sigma/n_n;
                 axpy(color, n, fi);
