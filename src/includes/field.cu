@@ -44,78 +44,69 @@ void cal_force(
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if(idx<N){
 
-        double *fi = p[idx].g_force();
+        double *fT = p[idx].g_fT();
         double *xi = p[idx].g_position();
-        double roi = p[idx].g_density();
+        double r[3], c;
 
-        // p[idx].reset_force();
+        p[idx].reset_force();
 
         // gravitational force
-        p[idx].s_force(g);  // reset force
-        multiply(&ro_0, fi);
-        __syncthreads();
+        double *fG = p[idx].g_fG();
+        p[idx].s_fG(g);
+        multiply(&ro_0, fG);
+        add(fT, fG);
 
-        // pressure
+        // pressure and viscosity
         {
+            double *fV = p[idx].g_fV(); // viscosity
+            double *fP = p[idx].g_fP();
+            double del_v[3]; // viscosity
             p[idx].s_pressure(k*(p[idx].g_density()-ro_0));
             __syncthreads();
-            double pr[3], r[3], c;
-            for(int i=0; i<3; i++) pr[i] = 0;
             for(int j=0; j<N; j++){
                 if(idx != j){
                     subtract(r,xi,p[j].g_position());
                     if(norm(r) <= h){
+
+                        subtract(del_v, p[j].g_velocity(), p[idx].g_velocity()); // viscosity
+                        c = p[j].g_md() * lap_viscosity(r, h); // viscosity
+                        axpy(c, del_v, fV); // viscosity
+
                         c = -1*(p[idx].g_pressure() + p[j].g_pressure())*p[j].g_md()/2;
                         grad_spiky(r, h);
-                        axpy(c, r, pr);
+                        axpy(c, r, fP);
+
                     }
                 }
             }
-            // printf("P(%d) = %lf %lf %lf\n", idx, pr[0], pr[1], pr[2]);
-            add(fi, pr);
+            axpy(mu, fV, fT);
+            add(fT, fP);
         }
         __syncthreads();
-
-        // viscosity
-        {
-            double vs[3], del_v[3], r[3], c;
-            for(int i=0; i<3; i++) vs[i] = 0;
-            for(int j=0; j<N; j++){
-                if(idx != j){
-                    subtract(r,xi,p[j].g_position());
-                    subtract(del_v, p[j].g_velocity(), p[idx].g_velocity());
-                    // if(idx==0 && j==1) printf("lap = %lf md = %lf\n", lap_viscosity(r, h),p[j].g_md());
-                    c = p[j].g_md() * lap_viscosity(r, h);
-                    axpy(c, del_v, vs);
-                    // if(idx==0 && j==1) printf("c = %lf vs = %lf %lf  %lf\n", c, vs[0], vs[1], vs[2]);
-                }
-            }
-            axpy(mu, vs, fi);
-        }
-        __syncthreads();
-
 
         // surface tension
         {
+            double *fS = p[idx].g_fS();
             // calculating c(i) and n(i)
-            double color = 0;
+            c = 0;
             double *n = p[idx].g_n();
-            for(int i=0; i<3; i++) n[i] = 0;
-            double r[3];
             for(int j=0; j<N; j++){
                 subtract(r,xi,p[j].g_position());
-                color += p[j].g_md() * lap_poly6(r, h);
-                grad_poly6(r,h);
-                axpy(p[j].g_md(), r, n);
+                if(norm(r) <= h){
+                    c += p[j].g_md() * lap_poly6(r, h);
+                    grad_poly6(r,h);
+                    axpy(p[j].g_md(), r, n);
+                }
             }
-            p[idx].s_color(color);
+            p[idx].s_color(c);
 
             // calculating surdace force
             double n_n = norm(n);
             if(n_n >= l){
-                color *= -sigma/n_n;
-                axpy(color, n, fi);
+                c *= -sigma/n_n;
+                axpy(c, n, fS);
             }
+            add(fT, fS);
         }
         __syncthreads();
     }
@@ -135,12 +126,12 @@ void cal_leapfrog(
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if(idx<N){
         double den = p[idx].g_density();
-        double *fi = p[idx].g_force();
+        double *fT = p[idx].g_fT();
         if(den>0){
 
             double c = del_t/(2*den);
 
-            axpy(c, fi, p[idx].g_velocity());
+            axpy(c, fT, p[idx].g_velocity());
 
             axpy(del_t, p[idx].g_velocity(), p[idx].g_position());
 
@@ -150,7 +141,7 @@ void cal_leapfrog(
                 xmin, xmax, ymin, ymax, zmin, zmax
             );
 
-            axpy(c, fi, p[idx].g_velocity());
+            axpy(c, fT, p[idx].g_velocity());
 
         }
     }

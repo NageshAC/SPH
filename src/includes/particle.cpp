@@ -17,15 +17,15 @@ class base_particle{
         double density, position[3], velocity[3];
     public:
         base_particle(){
-            density = 0.;
-            for(int i=0;i<3; i++) position[i] = 0.;
-            for(int i=0;i<3; i++) velocity[i] = 0.;
+            this->density = 0.;
+            for(int i=0;i<3; i++) this->position[i] = 0.;
+            for(int i=0;i<3; i++) this->velocity[i] = 0.;
         }
 
         base_particle(const base_particle& other){
-            density = other.density;
-            for(int i=0;i<3; i++) position[i] = other.position[i];
-            for(int i=0;i<3; i++) velocity[i] = other.velocity[i];
+            this->density = other.density;
+            for(int i=0;i<3; i++) this->position[i] = other.position[i];
+            for(int i=0;i<3; i++) this->velocity[i] = other.velocity[i];
         }
 
         // __host__ __device__
@@ -81,17 +81,22 @@ class base_particle{
 
 class particle : public base_particle{
     private:
-        double mass, m_d, pressure, color, n[3], force[3];
+        double mass, m_d, pressure, color, n[3], fT[3];
+        double fP[3], fG[3], fV[3], fS[3];
         bool *neighbors;
     public:
         // constructor
         particle(){
-            m_d = 0.0;
-            pressure = 0.0;
-            mass = 0.0;
-            color = 0.0;
-            for(int i=0;i<3; i++) force[i] = 0.0;
-            for(int i=0;i<3; i++) n[i]=0.0;
+            this->m_d = 0.0;
+            this->pressure = 0.0;
+            this->mass = 0.0;
+            this->color = 0.0;
+            for(int i=0;i<3; i++) this->fP[i] = 0.0;
+            for(int i=0;i<3; i++) this->fG[i] = 0.0;
+            for(int i=0;i<3; i++) this->fV[i] = 0.0;
+            for(int i=0;i<3; i++) this->fS[i] = 0.0;
+            for(int i=0;i<3; i++) this->fT[i] = 0.0;
+            for(int i=0;i<3; i++) this->n[i]=0.0;
         }
 
         //*************************************************
@@ -117,13 +122,34 @@ class particle : public base_particle{
             }
 
             __host__ __device__
-            inline void s_force(const double *other){
+            inline void s_fT(const double *other){
                 for(int i=0;i<3; i++)
-                    this->force[i] = other[i];
+                    this->fT[i] = other[i];
             }
 
-        
+            __host__ __device__
+            inline void s_fP(const double *other){
+                for(int i=0;i<3; i++)
+                    this->fP[i] = other[i];
+            }
 
+            __host__ __device__
+            inline void s_fG(const double *other){
+                for(int i=0;i<3; i++)
+                    this->fG[i] = other[i];
+            }
+            
+            __host__ __device__
+            inline void s_fV(const double *other){
+                for(int i=0;i<3; i++)
+                    this->fV[i] = other[i];
+            }
+            
+            __host__ __device__
+            inline void s_fS(const double *other){
+                for(int i=0;i<3; i++)
+                    this->fS[i] = other[i];
+            }
         //*************************************************
         // getters
         //*************************************************
@@ -144,28 +170,43 @@ class particle : public base_particle{
             inline double* g_n(){return this->n;}
 
             __host__ __device__
-            inline double* g_force(){return this->force;}
+            inline double* g_fT(){return this->fT;}
         
+            __host__ __device__
+            inline double* g_fG(){return this->fG;}
+
+            __host__ __device__
+            inline double* g_fV(){return this->fV;}
+
+            __host__ __device__
+            inline double* g_fS(){return this->fS;}
+
+            __host__ __device__
+            inline double* g_fP(){return this->fP;}
 
         //*************************************************
         // common functions
         //*************************************************
 
             __host__ __device__
-            void update_md(){
+            inline void update_md(){
                 if(density != 0)
                     this->m_d = mass/density;
                 else m_d = -1;
             }
         
             __host__ __device__
-            void reset_force(){
-                for(int i=0; i<3; i++)
-                    this->force[i] = 0.0;
+            inline void reset_force(){
+                for(int i=0; i<3; i++)this->fT[i] = 0.0;
+                for(int i=0;i<3; i++) this->fP[i] = 0.0;
+                for(int i=0;i<3; i++) this->fG[i] = 0.0;
+                for(int i=0;i<3; i++) this->fV[i] = 0.0;
+                for(int i=0;i<3; i++) this->fS[i] = 0.0;
+                for(int i=0; i<3; i++) this->n[i] = 0.0;
             }
         
             __host__
-            void init_neighbours(int N){
+            inline void init_neighbours(int N){
                 *neighbors = new bool [N];
             }
 
