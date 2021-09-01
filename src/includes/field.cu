@@ -18,11 +18,16 @@
 // density calculation
 //************************************************************
 __global__
-void cal_density(particle* p, double ro_0, int N, double h){
+void cal_density(particle* p, const double ro_0, const int N, const double h){
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if(idx<N){
+
+        p[idx].update_cell(h);
+        __syncthreads();
+
         double den = 0;
         for(int j=0; j<N; j++){
+            if(! p[idx].is_neighbour(p[j].g_cell())) continue;
             double r[3]; 
             subtract(r,p[idx].g_position(),p[j].g_position());
             den += p[j].g_mass() * w_poly6(r, h);
@@ -38,8 +43,8 @@ void cal_density(particle* p, double ro_0, int N, double h){
 __global__
 void cal_force(
     particle* p, const double* g, 
-    double ro_0, double k, double mu,
-    double sigma, double l, int N, double h
+    const double ro_0, const double k, const double mu,
+    const double sigma, const double l, const int N, const double h
 ){
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if(idx<N){
@@ -65,18 +70,19 @@ void cal_force(
             __syncthreads();
             for(int j=0; j<N; j++){
                 if(idx != j){
+                    if(! p[idx].is_neighbour(p[j].g_cell())) continue;
+
+
                     subtract(r,xi,p[j].g_position());
-                    if(norm(r) <= h){
 
-                        subtract(del_v, p[j].g_velocity(), p[idx].g_velocity()); // viscosity
-                        c = p[j].g_md() * lap_viscosity(r, h); // viscosity
-                        axpy(c, del_v, fV); // viscosity
+                    subtract(del_v, p[j].g_velocity(), p[idx].g_velocity()); // viscosity
+                    c = p[j].g_md() * lap_viscosity(r, h); // viscosity
+                    axpy(c, del_v, fV); // viscosity
 
-                        c = -1*(p[idx].g_pressure() + p[j].g_pressure())*p[j].g_md()/2;
-                        grad_spiky(r, h);
-                        axpy(c, r, fP);
+                    c = -1*(p[idx].g_pressure() + p[j].g_pressure())*p[j].g_md()/2;
+                    grad_spiky(r, h);
+                    axpy(c, r, fP);
 
-                    }
                 }
             }
             axpy(mu, fV, fT);
@@ -91,12 +97,12 @@ void cal_force(
             c = 0;
             double *n = p[idx].g_n();
             for(int j=0; j<N; j++){
+                if(! p[idx].is_neighbour(p[j].g_cell())) continue;
+
                 subtract(r,xi,p[j].g_position());
-                if(norm(r) <= h){
-                    c += p[j].g_md() * lap_poly6(r, h);
-                    grad_poly6(r,h);
-                    axpy(p[j].g_md(), r, n);
-                }
+                c += p[j].g_md() * lap_poly6(r, h);
+                grad_poly6(r,h);
+                axpy(p[j].g_md(), r, n);
             }
             p[idx].s_color(c);
 

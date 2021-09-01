@@ -83,7 +83,7 @@ class particle : public base_particle{
     private:
         double mass, m_d, pressure, color, n[3], fT[3];
         double fP[3], fG[3], fV[3], fS[3];
-        bool *neighbors;
+        int cell[3];
     public:
         // constructor
         particle(){
@@ -97,6 +97,7 @@ class particle : public base_particle{
             for(int i=0;i<3; i++) this->fS[i] = 0.0;
             for(int i=0;i<3; i++) this->fT[i] = 0.0;
             for(int i=0;i<3; i++) this->n[i]=0.0;
+            for(int i=0;i<3; i++) this->cell[i]=0;
         }
 
         //*************************************************
@@ -183,6 +184,9 @@ class particle : public base_particle{
 
             __host__ __device__
             inline double* g_fP(){return this->fP;}
+            
+            __host__ __device__
+            inline int* g_cell(){return this->cell;}
 
         //*************************************************
         // common functions
@@ -205,11 +209,32 @@ class particle : public base_particle{
                 for(int i=0; i<3; i++) this->n[i] = 0.0;
             }
         
-            __host__
-            inline void init_neighbours(int N){
-                *neighbors = new bool [N];
+            __host__ __device__
+            inline void update_cell(double h){
+                for(int i=0; i<3; i++) cell[i] = int(position[i]/h);
             }
 
+            __host__ __device__
+            inline bool is_neighbour(particle* p){
+                const int* cj = p->g_cell();
+
+                if(
+                    cell[0]-1 <= cj[0] && cj[0] <= cell[0]+1 &&
+                    cell[1]-1 <= cj[1] && cj[1] <= cell[1]+1 &&
+                    cell[2]-1 <= cj[2] && cj[2] <= cell[2]+1
+                )  return true;
+                else return false;
+            }
+
+            __host__ __device__
+            inline bool is_neighbour(const int* cj){
+                if(
+                    cell[0]-1 <= cj[0] && cj[0] <= cell[0]+1 &&
+                    cell[1]-1 <= cj[1] && cj[1] <= cell[1]+1 &&
+                    cell[2]-1 <= cj[2] && cj[2] <= cell[2]+1
+                )  return true;
+                else return false;
+            }
         
 };
 
