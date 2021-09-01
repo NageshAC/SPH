@@ -127,7 +127,7 @@ void cal_leapfrog(
     const double xmin, const double xmax,
     const double ymin, const double ymax, 
     const double zmin, const double zmax,
-    const double del_t, const int N){
+    const double del_t, const int N, const double CR){
 
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if(idx<N){
@@ -144,7 +144,7 @@ void cal_leapfrog(
             // boundary condition
             check_bound(
                 p[idx].g_position(), p[idx].g_velocity(), del_t,
-                xmin, xmax, ymin, ymax, zmin, zmax
+                xmin, xmax, ymin, ymax, zmin, zmax, CR
             );
 
             axpy(c, fT, p[idx].g_velocity());

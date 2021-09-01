@@ -64,6 +64,7 @@ void create_par(){
         f << "l                " << 7.065 <<endl;
         f << "k                " << 3 <<endl;
         f << "h                " << 0.03 <<endl;
+        f << "CR                " << 0.03 <<endl;
         f << "x_min            " << 0 <<endl;
         f << "x_max            " << 0.15 <<endl;
         f << "y_min            " << 0 <<endl;

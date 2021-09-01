@@ -35,7 +35,7 @@
 
     string part_in_file, vtk_out_file;
     int vtk_out_freq;
-    double time_end, del_t, ro_0, mu, sigma, l, 
+    double time_end, del_t, ro_0, mu, sigma, l, CR,
         k, h, x_min, x_max, y_min, y_max, z_min, z_max;
     host_vector<double> g(3,0);
 
@@ -48,7 +48,7 @@
             part_in_file, vtk_out_freq,
             vtk_out_file, time_end, del_t, 
             raw_pointer_cast(&g[0]), 
-            ro_0, mu,
+            ro_0, mu, CR,
             sigma, l, k, h,
             x_min, x_max,
             y_min, y_max,
@@ -58,7 +58,7 @@
         //     part_in_file, vtk_out_freq,
         //     vtk_out_file, time_end, del_t, 
         //     raw_pointer_cast(&g[0]), 
-        //     ro_0, mu,
+        //     ro_0, mu, CR
         //     sigma, l, k, h,
         //     x_min, x_max,
         //     y_min, y_max,
@@ -163,7 +163,7 @@
                 raw_pointer_cast(&d_p[0]),
                 x_min, x_max, y_min, 
                 y_max, z_min, z_max,
-                del_t, N
+                del_t, N, CR
             );
             cudaDeviceSynchronize();
 

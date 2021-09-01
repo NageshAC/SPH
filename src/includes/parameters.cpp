@@ -19,7 +19,7 @@ inline void readParam(
     string& part_in_file, int& vtk_out_freq,
     string& vtk_out_file, double& time_end,
     double& del_t, double* g, double& ro_0, 
-    double& mu,
+    double& mu, double& CR,
     double& sigma, double& l, 
     double& k, double& h,
     double& x_min, double& x_max,
@@ -46,6 +46,7 @@ inline void readParam(
             if(out == "l") f>>l;
             if(out == "k") f>>k;
             if(out == "h") f>>h;
+            if(out == "CR") f>>CR;
             if(out == "x_min") f>>x_min;
             if(out == "x_max") f>>x_max;
             if(out == "y_min") f>>y_min;
