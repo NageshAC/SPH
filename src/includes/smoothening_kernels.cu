@@ -21,12 +21,14 @@ using namespace thrust;
 //**************************************************
 // W_poly6, grad_poly6 and lap_poly6
 //**************************************************
+
 __device__
 inline double w_poly6 (const double* r, const double h){
-    double n_r = norm(r);
+    double n_r2 = norm2(r);
+    double h2 = pow(h,2);
     double result;
-    if(0<=n_r && n_r<=h){
-        result = pow(pow(h,2) - pow(n_r,2), 3);
+    if(n_r2<=h2){
+        result = pow(h2 - n_r2, 3);
     }
     else return 0;
     double c = 315/(64*M_PI*pow(h,9));
@@ -36,11 +38,12 @@ inline double w_poly6 (const double* r, const double h){
 
 __device__
 inline void grad_poly6(double* r, const double h){
-    double n_r = norm(r);
+    double n_r2 = norm2(r);
+    double h2 = pow(h,2);
     double result = 0;
-    if(0<=n_r && n_r<=h){
+    if(n_r2<=h2){
         double c = -945/(32*M_PI*pow(h,9));
-        result = pow(pow(h,2) - pow(n_r,2), 2);
+        result = pow(h2 - n_r2, 2);
         result *= c;
     }
     multiply(&result, r);
@@ -48,12 +51,13 @@ inline void grad_poly6(double* r, const double h){
 
 __device__
 inline double lap_poly6(const double* r, const double h){
-    double n_r = norm(r);
-    if(0<=n_r && n_r<=h){
+    double n_r2 = norm2(r);
+    double h2 = pow(h,2);
+    if(n_r2<=h2){
         double c = -945/(32*M_PI*pow(h,9));
         double result;
-        result = pow(h,2) - pow(n_r,2);
-        result *= (3*pow(h,2)-7*pow(n_r,2));
+        result = h2 - n_r2;
+        result *= (3*h2-7*n_r2);
         return c*result;
     }
     return 0;
