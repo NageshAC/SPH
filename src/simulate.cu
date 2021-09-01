@@ -81,6 +81,9 @@
         // );
     }
 
+    // initialization of neighbors
+    // for (int i = 0; i < N; i++) p[i].init_neighbours(N);
+
     //**************************************************
     // boundary 
     //**************************************************
@@ -90,7 +93,6 @@
         z_min, z_max
     );
 
-    // write_VTK(vtk_out_file, 0, raw_pointer_cast(&p[0]), N);
 
     //**************************************************
     // CUDA Programming
@@ -122,15 +124,26 @@
         // cout<<"Block Size: "<<blockSize<<"\nGrid size: "<<gridSize<<endl
         // <<"Frames: "<<frames<<endl;
 
+        // time
         auto start = chrono::high_resolution_clock::now();
+        float fTime = 0.0, milliseconds = 0.0;
+        cudaEvent_t str, stp;
+        cudaEventCreate(&str);
+        cudaEventCreate(&stp);
 
         for(int frame = 1; frame<=frames; frame++){
+
+            cudaEventRecord(str);
             // calculate density
             cal_density<<<gridSize,blockSize>>>(
                 raw_pointer_cast(&d_p[0]),
                 ro_0, N, h
             );
             cudaDeviceSynchronize();
+            cudaEventRecord(stp);
+            cudaEventSynchronize(stp);
+            cudaEventElapsedTime(&milliseconds, str, stp);
+            fTime += milliseconds;
 
             if(frame == 1){
                 p = d_p;
@@ -153,8 +166,9 @@
                 del_t, N
             );
             cudaDeviceSynchronize();
-            // cuda_status(cudaMemcpy(raw_pointer_cast(&p[0]), raw_pointer_cast(&d_p[0]), sizeof(particle), cudaMemcpyDeviceToHost));
+
             p = d_p;
+
             write_VTK(vtk_out_file, frame, raw_pointer_cast(&p[0]), N);
 
         }
@@ -162,6 +176,8 @@
         auto end = chrono::high_resolution_clock::now();
         chrono::duration<float> duration = end - start;
         cout << duration.count() << "s \n";
+
+        cout << fTime << "ms\n";
 
     }
 

@@ -18,7 +18,8 @@ using namespace std;
 
 void write_VTK(
     string fileName, int file_count,
-    particle* p, const int& N
+    particle* p, const int& N, 
+    const bool verbose = false
 ){
     fstream file;
     string ffName;
@@ -52,6 +53,12 @@ void write_VTK(
         for(int j=0; j<N; j++)
             file<<setprecision(6)<<std::fixed<<p[j].g_density()<<endl;
 
+        // for(int j=0; j<N; j++){
+        //     double* f = p[j].g_force();
+        //     for(int k=0; k<dim; k++)
+        //         file<<setprecision(6)<<std::fixed<<f[k]<<" ";
+        //     file<<endl;
+        // }
 
         // V data
         file<<"VECTORS v double\n";
@@ -62,7 +69,7 @@ void write_VTK(
             file<<endl;
         }
 
-        cout<<"\033[1;32m\n\tDone writing " << fileName + "_" + to_string(file_count) + ".vtk" << "\n\033[0m\n";
+        if (verbose) cout<<"\033[1;32m\n\tDone writing " << fileName + "_" + to_string(file_count) + ".vtk" << "\n\033[0m\n";
 
         file.close();
 

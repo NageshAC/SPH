@@ -11,8 +11,8 @@
 #include<cuda_runtime.h>
 #include"./particle.cpp"
 #include"./smoothening_kernels.cu"
-#include"./operators.cu"
-#include"./check_boundary.cu"
+#include"./operators.cu"    
+#include"./check.cu"
 
 //************************************************************
 // density calculation
@@ -21,18 +21,13 @@ __global__
 void cal_density(particle* p, double ro_0, int N, double h){
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if(idx<N){
-        double mass = 0;
+        double den = 0;
         for(int j=0; j<N; j++){
             double r[3]; 
             subtract(r,p[idx].g_position(),p[j].g_position());
-            double w = w_poly6(r, h);
-            if (w==0 && idx==j) {
-                printf("%d w %d is zero\n",idx,j);
-                printf("%lf %lf %lf \n", r[0], r[1], r[2]);
-            }
-            mass += p[j].g_mass() * w;
+            den += p[j].g_mass() * w_poly6(r, h);
         }
-        p[idx].s_density(mass);
+        p[idx].s_density(den);
         p[idx].update_md();
     }
 }
@@ -53,9 +48,33 @@ void cal_force(
         double *xi = p[idx].g_position();
         double roi = p[idx].g_density();
 
+        // p[idx].reset_force();
+
         // gravitational force
-        p[idx].s_force(g);
+        p[idx].s_force(g);  // reset force
         multiply(&ro_0, fi);
+        __syncthreads();
+
+        // pressure
+        {
+            p[idx].s_pressure(k*(p[idx].g_density()-ro_0));
+            __syncthreads();
+            double pr[3], r[3], c;
+            for(int i=0; i<3; i++) pr[i] = 0;
+            for(int j=0; j<N; j++){
+                if(idx != j){
+                    subtract(r,xi,p[j].g_position());
+                    if(norm(r) <= h){
+                        c = -1*(p[idx].g_pressure() + p[j].g_pressure())*p[j].g_md()/2;
+                        grad_spiky(r, h);
+                        axpy(c, r, pr);
+                    }
+                }
+            }
+            // printf("P(%d) = %lf %lf %lf\n", idx, pr[0], pr[1], pr[2]);
+            add(fi, pr);
+        }
+        __syncthreads();
 
         // viscosity
         {
@@ -63,8 +82,8 @@ void cal_force(
             for(int i=0; i<3; i++) vs[i] = 0;
             for(int j=0; j<N; j++){
                 if(idx != j){
-                    subtract(del_v, p[j].g_velocity(), p[idx].g_velocity());
                     subtract(r,xi,p[j].g_position());
+                    subtract(del_v, p[j].g_velocity(), p[idx].g_velocity());
                     // if(idx==0 && j==1) printf("lap = %lf md = %lf\n", lap_viscosity(r, h),p[j].g_md());
                     c = p[j].g_md() * lap_viscosity(r, h);
                     axpy(c, del_v, vs);
@@ -73,39 +92,19 @@ void cal_force(
             }
             axpy(mu, vs, fi);
         }
+        __syncthreads();
 
-        // pressure
-        {
-            double pr[3], r[3], c;
-            for(int i=0; i<3; i++) pr[i] = 0;
-            for(int j=0; j<N; j++){
-                if(idx != j){
-                    subtract(r,xi,p[j].g_position());
-                    if(norm(r) < h){
-                        c = -1*k*(roi+p[j].g_density()-2*ro_0)*p[j].g_md()/2;
-                        grad_spiky(r, h);
-                        axpy(c, r, pr);
-                    }
-                }
-            }
-            add(fi, pr);
-        }
-        
+
         // surface tension
         {
             // calculating c(i)
             double color = 0;
             double r[3];
             for(int j=0; j<N; j++){
-                if(idx != j){ 
+                // if(idx != j){ 
                     subtract(r,p[idx].g_position(),p[j].g_position());
-                    double w = lap_poly6(r, h);
-                    // if (w==0 && idx==j) {
-                    //     printf("%d w %d is zero\n",idx,j);
-                    //     printf("%lf %lf %lf \n", r[0], r[1], r[2]);
-                    // }
-                    color += p[j].g_md() * w;
-                }
+                    color += p[j].g_md() * lap_poly6(r, h);
+                // }
             }
             p[idx].s_color(color);
 
@@ -119,13 +118,14 @@ void cal_force(
             }
             p[idx].s_n(n);
 
-            // calculating viscous force
+            // calculating surdace force
             double n_n = norm(p[idx].g_n());
             if(n_n >= l){
                 color *= -sigma/n_n;
                 axpy(color, n, fi);
             }
         }
+        __syncthreads();
     }
 }
 

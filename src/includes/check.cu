@@ -16,32 +16,38 @@ void check_bound(
     double zmin, double zmax
 ){
     
-    double R = 0.3; // co-efficient of restitution
+    double R = 0.4; // co-efficient of restitution
+    double s = 0.01; // safty factor
 
-    if(x[0] < xmin){
+    if(x[0] < xmin + s*(xmax-xmin)){
         x[0] = xmin + R * (v[0]*del_t - xmin + x[0]);
-        v[0] *= 0.;
+        v[0] *= -R;
     }
-    if(x[1] < ymin){
+    if(x[1] < ymin + s*(ymax-ymin)){
         x[1] = ymin + R * (v[1]*del_t - ymin + x[1]);
-        v[1] *= 0.;
+        v[1] *= -R;
     }
-    if(x[2] < zmin){
+    if(x[2] < zmin + s*(zmax-zmin)){
         x[2] = zmin + R * (v[2]*del_t - zmin + x[2]);
-        v[2] *= 0.;
+        v[2] *= -R;
     }
 
-    if(x[0] > xmax){
+    if(x[0] > xmax - s*(xmax-xmin)){
         x[0] = xmax - R * (v[0]*del_t - x[0] + xmax);
-        v[0] *= 0.;
+        v[0] *= -R;
     }
-    if(x[1] > ymax){
+    if(x[1] > ymax - s*(ymax-ymin)){
         x[1] = ymax - R * (v[1]*del_t - x[1] + ymax);
-        v[1] *= 0.;
+        v[1] *= -R;
     }
-    if(x[2] > zmax){
+    if(x[2] > zmax - s*(zmax-zmin)){
         x[2] = zmax - R * (v[2]*del_t - x[2] + zmax);
-        v[2] *= 0.;
+        v[2] *= -R;
     }
+
+}
+
+__device__
+void check_collision (particle* p){
 
 }

@@ -17,7 +17,7 @@
 // copy function
 //**************************************************************
 __device__ __host__
-void copy(double* x, const double* y, int n = 3){
+inline void copy(double* x, const double* y, int n = 3){
     for(int i=0; i<n; i++)
         x[i] = y[i];
 }
@@ -26,19 +26,27 @@ void copy(double* x, const double* y, int n = 3){
 // l2 norm
 //**************************************************************
 __device__
-double norm(const double* x, int dim = 3){
+inline double norm(const double* x, int dim = 3){
     double result = 0;
     for(int i=0; i<dim; i++){
         result += pow(x[i],2);
     }
     return sqrt(result);
 }
+__device__
+inline double norm2(const double* x, int dim = 3){
+    double result = 0;
+    for(int i=0; i<dim; i++){
+        result += pow(x[i],2);
+    }
+    return (result);
+}
 
 //**************************************************************
 // vector const multiplication
 //**************************************************************
 __device__
-void axpy(const double a, const double* x, double* y, int dim =3){
+inline void axpy(const double a, const double* x, double* y, int dim =3){
     for(int i=0; i<3; i++) y[i] += a * x[i];
 
 }
@@ -47,12 +55,12 @@ void axpy(const double a, const double* x, double* y, int dim =3){
 // vector const multiplication
 //**************************************************************
 __device__
-void multiply(const double* c, double* x, int dim = 3){
+inline void multiply(const double* c, double* x, int dim = 3){
     for(auto i=0; i<dim; i++) x[i] *= *c;
 }
 
 __device__
-void multiply(double* r, const double c, const double* x, int dim = 3){
+inline void multiply(double* r, const double c, const double* x, int dim = 3){
     for(auto i=0; i<dim; i++) r[i] = x[i] * (c);
 }
 
@@ -60,12 +68,12 @@ void multiply(double* r, const double c, const double* x, int dim = 3){
 // vector vector subtraction
 //**************************************************************
 __device__
-void subtract(double* x, const double* y, int dim = 3){
+inline void subtract(double* x, const double* y, int dim = 3){
     for(int i=0; i<3; i++) x[i] = x[i] - y[i];
 }
 
 __device__
-void subtract(double* r, const double* x, const double* y, int dim = 3){
+inline void subtract(double* r, const double* x, const double* y, int dim = 3){
     for(int i=0; i<3; i++) r[i] = x[i] - y[i];
 }
 
@@ -73,11 +81,11 @@ void subtract(double* r, const double* x, const double* y, int dim = 3){
 // vector vector addition
 //**************************************************************
 __device__
-void add(double* x, const double* y, int dim = 3){
+inline void add(double* x, const double* y, int dim = 3){
     for(int i=0; i<3; i++) x[i] = x[i] + y[i];
 }
 
 __device__
-void add(double* r, const double* x, const double* y, int dim = 3){
+inline void add(double* r, const double* x, const double* y, int dim = 3){
     for(int i=0; i<3; i++) r[i] = x[i] + y[i];
 }

@@ -10,10 +10,8 @@
 #pragma once
 
 #include<cmath>
-#include<thrust/device_vector.h>
 #include<cuda_runtime.h>
 
-#include "./includes/particle.cpp"
 #include "./includes/operators.cu"
 
 #define M_PI 3.14159265358979323846
@@ -30,25 +28,22 @@ inline double w_poly6 (const double* r, const double h){
     if(0<=n_r && n_r<=h){
         result = pow(pow(h,2) - pow(n_r,2), 3);
     }
-    else if(n_r > h){
-        return 0;
-    }
+    else return 0;
     double c = 315/(64*M_PI*pow(h,9));
     result *= c;
     return result;
-    
 }
 
 __device__
 inline void grad_poly6(double* r, const double h){
     double n_r = norm(r);
+    double result = 0;
     if(0<=n_r && n_r<=h){
         double c = -945/(32*M_PI*pow(h,9));
-        double result;
         result = pow(pow(h,2) - pow(n_r,2), 2);
         result *= c;
-        multiply(&result, r);
     }
+    multiply(&result, r);
 }
 
 __device__
@@ -58,7 +53,7 @@ inline double lap_poly6(const double* r, const double h){
         double c = -945/(32*M_PI*pow(h,9));
         double result;
         result = pow(h,2) - pow(n_r,2);
-        result *= 3*pow(h,2)-7*pow(n_r,2);
+        result *= (3*pow(h,2)-7*pow(n_r,2));
         return c*result;
     }
     return 0;
@@ -70,11 +65,12 @@ inline double lap_poly6(const double* r, const double h){
 __device__
 inline void grad_spiky(double* r, const double h){
     double n_r = norm(r);
-    if(0<n_r && n_r<=h){
+    if(0<=n_r && n_r<=h){
         double c = -45/(M_PI*pow(h,6)*n_r);
         double result = pow(h-n_r, 2);
-        result *= c;
+        result *= c / 1000;
         multiply(&result, r);
+        // printf("w_spiky = %lf \n", result);
     }
     else{
         for(int i=0; i<3; i++) r[i] = 0;
@@ -87,7 +83,7 @@ inline void grad_spiky(double* r, const double h){
 __device__
 inline double lap_viscosity(const double* r, const double h){
     double n_r = norm(r);
-    if(0.05<=n_r && n_r<h){
+    if(0<=n_r && n_r<=h){
         double c = 45/(M_PI*pow(h,6));
         double result = h-n_r;
         result *= c;
