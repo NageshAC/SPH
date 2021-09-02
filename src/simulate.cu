@@ -4,7 +4,7 @@
  * @create date 2021-08-09 21:21:59
  * @modify date 2021-08-09 21:21:59
  * @desc main file: contains all the function calls and kernel calls
- */
+*/
 
  #include<iostream>
  #include<string>

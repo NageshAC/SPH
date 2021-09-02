@@ -4,7 +4,7 @@
  * @create date 2021-08-10 11:44:00
  * @modify date 2021-08-10 11:44:00
  * @desc Contains error diagnosis functions
- */
+*/
 
  #pragma once
  

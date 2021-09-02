@@ -4,7 +4,7 @@
  * @create date 2021-07-28 09:49:27
  * @modify date 2021-07-28 09:49:27
  * @desc contains definitions of all smoothening kernels.
- */
+*/
  
  
  #pragma once

@@ -4,7 +4,7 @@
  * @create date 2021-08-07 12:44:33
  * @modify date 2021-08-07 12:44:33
  * @desc creates a demo water.par water.in file with particle data
- */
+*/
 
  #include<iostream>
  #include<fstream>

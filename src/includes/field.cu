@@ -4,7 +4,7 @@
  * @create date 2021-08-10 12:19:30
  * @modify date 2021-08-10 12:19:30
  * @desc Contains definitions of field calculation such as force, Pressure ...
- */
+*/
 
  #pragma once
 

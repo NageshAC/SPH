@@ -4,7 +4,8 @@
  * @create date 2021-07-28 09:50:26
  * @modify date 2021-07-28 09:50:26
  * @desc Reads input from ./data/*.in file.
- */
+*/
+ 
  #pragma once
 
  #include<iostream>
