@@ -93,6 +93,9 @@
         z_min, z_max
     );
 
+    const static double POLY6 = 315/(64*M_PI*pow(h,9));
+    const static double GPOLY6 = -945/(32*M_PI*pow(h,9));
+    const static double PV = 45/(M_PI*pow(h,6));
 
     //**************************************************
     // CUDA Programming
@@ -137,7 +140,7 @@
             // calculate density
             cal_density<<<gridSize,blockSize>>>(
                 raw_pointer_cast(&d_p[0]),
-                ro_0, N, h
+                ro_0, N, h, POLY6
             );
             cudaDeviceSynchronize();
             cudaEventRecord(stp);
@@ -154,7 +157,8 @@
             cal_force<<<gridSize,blockSize>>>(
                 raw_pointer_cast(&d_p[0]),
                 raw_pointer_cast(&d_g[0]),
-                ro_0, k, mu, sigma, l, N, h
+                ro_0, k, mu, sigma, l, N, h, 
+                GPOLY6, PV
             );
             cudaDeviceSynchronize();
 

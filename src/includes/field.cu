@@ -18,7 +18,10 @@
 // density calculation
 //************************************************************
 __global__
-void cal_density(particle* p, const double ro_0, const int N, const double h){
+void cal_density(
+    particle* p, const double ro_0, 
+    const int N, const double h, const double POLY6
+){
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if(idx<N){
 
@@ -30,7 +33,7 @@ void cal_density(particle* p, const double ro_0, const int N, const double h){
             if(! p[idx].is_neighbour(p[j].g_cell())) continue;
             double r[3]; 
             subtract(r,p[idx].g_position(),p[j].g_position());
-            den += p[j].g_mass() * w_poly6(r, h);
+            den += p[j].g_mass() * w_poly6(r, POLY6, h);
         }
         p[idx].s_density(den);
         p[idx].update_md();
@@ -44,7 +47,8 @@ __global__
 void cal_force(
     particle* p, const double* g, 
     const double ro_0, const double k, const double mu,
-    const double sigma, const double l, const int N, const double h
+    const double sigma, const double l, const int N, 
+    const double h, const double GPOLY6, const double PV
 ){
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if(idx<N){
@@ -76,11 +80,11 @@ void cal_force(
                     subtract(r,xi,p[j].g_position());
 
                     subtract(del_v, p[j].g_velocity(), p[idx].g_velocity()); // viscosity
-                    c = p[j].g_md() * lap_viscosity(r, h); // viscosity
+                    c = p[j].g_md() * lap_viscosity(r, PV, h); // viscosity
                     axpy(c, del_v, fV); // viscosity
 
                     c = -1*(p[idx].g_pressure() + p[j].g_pressure())*p[j].g_md()/2;
-                    grad_spiky(r, h);
+                    grad_spiky(r, PV, h);
                     axpy(c, r, fP);
 
                 }
@@ -100,8 +104,8 @@ void cal_force(
                 if(! p[idx].is_neighbour(p[j].g_cell())) continue;
 
                 subtract(r,xi,p[j].g_position());
-                c += p[j].g_md() * lap_poly6(r, h);
-                grad_poly6(r,h);
+                c += p[j].g_md() * lap_poly6(r, GPOLY6, h);
+                grad_poly6(r, GPOLY6, h);
                 axpy(p[j].g_md(), r, n);
             }
             p[idx].s_color(c);
