@@ -17,7 +17,7 @@ void check_bound(
     const double CR
 ){
     
-    double s = 0.01; // safty factor
+    double s = 1.5e-3; // safty factor
 
     if(x[0] < xmin + s){
         x[0] = xmin + CR * (v[0]*del_t - xmin + x[0]);
