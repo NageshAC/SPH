@@ -101,7 +101,7 @@ where <img src="https://render.githubusercontent.com/render/math?math=$g$" alt="
 
 <div><h3>3.4 Viscosity Field</h3>
 
-<p align="justify">Applying the SPH to the viscosity term $\mu\nabla^2v$ again yields asymmetric forces</p>
+<p align="justify">Applying the SPH to the viscosity term <img src="https://render.githubusercontent.com/render/math?math=$\mu\nabla^2v$" alt="$\mu\nabla^2v$"> again yields asymmetric forces</p>
 <div align="center"><img src="https://render.githubusercontent.com/render/math?math=$\large f_i^{viscosity}=\mu\nabla^2v = \mu\ \sum_{\forall j}\ m_j\ \frac{v_j}{\rho_j}\ \nabla^2\ W(r,\ h)$" alt="$$f_i^{viscosity}=\mu\nabla^2v = \mu\ \sum_{\forall j}\ m_j\ \frac{v_j}{\rho_j}\ \nabla^2\ W(r,\ h)$$"> </div>
 
 <p align="justify">Since viscosity forces are only dependent on velocity differences and not on absolute velocities, there is a natural way to symmetrize the viscosity forces by using velocity differences: </p>
