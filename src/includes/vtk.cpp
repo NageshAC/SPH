@@ -13,7 +13,7 @@
 #include<fstream>
 #include<iomanip>
 
-#include "./includes/particle.cpp"
+#include "particle.cpp"
 using namespace std;
 
 void write_VTK(

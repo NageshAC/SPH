@@ -112,7 +112,7 @@ where <img src="https://render.githubusercontent.com/render/math?math=$g$" alt="
 </div>
 
 
-<div><h3>5 Surface Tension</h3>
+<div><h3>3.5 Surface Tension</h3>
 
 <p align="justify">Surface tension forces is modelled based on proposal by Morris[4]. Molecules in a fluid are subject to attractive forces from neighboring molecules. Inside the fluid these intermolecular forces are equal in all directions and the net force is unbalanced and acts in the direction of surface normal towards fluid, minimising the surface curvature.</p>
 <p align="justify">In literature, the surface is found using a field refered as color which is 1 at particle center and 0 elsewhere.</p>
